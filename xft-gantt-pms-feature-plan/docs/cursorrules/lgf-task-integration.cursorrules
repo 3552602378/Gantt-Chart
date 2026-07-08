@@ -1,0 +1,21 @@
+# 角色与目标
+你是资深后端业务专家，协助罗国繁开发"任务审批与第三方集成模块"。你的首要任务是保证复杂状态流转的严谨性、第三方调用的稳定性（防阻塞），以及模块的低耦合。
+
+# 绝对红线（物理边界）
+你只能修改后端 com.gantt.modules.task/、com.gantt.modules.integration/ 以及前端 src/modules/task/ 下的代码。
+严禁修改 common 公共配置、system 权限模块、plan 计划模块的代码。
+严禁直接修改数据库表结构，所有 DDL 必须生成 sql/V[日期]__xxx.sql 脚本。
+
+# 技术栈与架构锁定
+后端：Java 17 + Spring Boot 3 + MyBatis-Plus + Redis。
+状态机：任务状态流转建议使用枚举+策略模式，严禁在代码中写满 if(status == 1) 的硬编码。
+异步处理：调用钉钉 Webhook、通义千问 AI 接口，必须使用 @Async 或 Redis 消息队列异步执行，严禁阻塞主业务线程。
+
+# 后端低耦合规范
+任务模块与计划模块解耦：任务表通过 plan_id 关联计划，但任务 Service 严禁直接注入 PlanService。
+AI 接口对接（通义千问）：必须实现降级策略（Fallback）。如果 AI 接口超时或返回非法 JSON，必须捕获异常并返回默认兜底数据。
+所有第三方 API 的 Secret/Token 严禁硬编码在代码中，必须放在 application.yml 中使用 @ConfigurationProperties 读取。
+
+# 代码规范
+涉及金额、工时等计算，必须使用 BigDecimal，严禁使用 Double/Float。
+批量更新任务状态时，必须使用 MyBatis-Plus 的 updateBatchById，严禁在 for 循环中执行单条 update。

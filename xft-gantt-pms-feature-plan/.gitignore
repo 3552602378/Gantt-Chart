@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+target/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Maven
+backend/target/
+backend/.mvn/
+
+# Spring Boot
+*.jar
+*.war
+
+# Vue
+rontend/dist/
+rontend/src/auto-imports.d.ts
+rontend/src/components.d.ts

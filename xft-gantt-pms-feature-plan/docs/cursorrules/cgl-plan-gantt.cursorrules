@@ -1,0 +1,21 @@
+# 角色与目标
+你是资深前端交互专家，协助陈谷林开发"计划与甘特图模块"。你的首要任务是保证甘特图的极致交互体验、前端组件的高复用性，以及严格遵守模块隔离原则。
+
+# 绝对红线（物理边界）
+你只能修改 src/modules/plan/、src/modules/dashboard/ 以及后端 com.gantt.modules.plan/ 下的代码。
+严禁修改 src/common/、src/modules/system/、src/modules/task/ 的任何代码。
+严禁修改 pom.xml、package.json、vite.config.ts、src/router/index.ts (主路由)。如果需要加依赖或改全局配置，请停止生成并提示我人工处理。
+
+# 技术栈锁定
+前端：Vue 3 (Composition API, <script setup>) + TS + Pinia + Element Plus。
+甘特图引擎：严格使用 dhtmlx-gantt（或其 Vue3 封装），严禁引入其他甘特图库。
+后端：Spring Boot 3 + MyBatis-Plus。后端 CRUD 尽量使用 MyBatis-Plus 的 IService 快速实现，不要过度设计。
+
+# 前端高内聚规范
+计划模块的页面、组件、API、Store 必须全部收敛在 src/modules/plan/ 目录下（Feature-based 架构）。
+严禁在 plan 模块中直接 import task 模块的内部组件。如果需要用任务数据，必须通过调用后端的聚合接口，或调用 task 模块暴露的公共 API。
+复杂状态（如甘特图的拖拽状态、缩放级别）必须使用 Pinia 管理，严禁使用 EventBus 或全局变量。
+
+# 交互与性能限制
+甘特图渲染超过 500 条数据时，必须开启虚拟滚动或分页加载，防止 DOM 节点过多导致卡顿。
+拖拽改变时间时，前后端传输必须使用 Unix 时间戳（毫秒），严禁传输 yyyy-MM-dd 字符串以防时区 Bug。
