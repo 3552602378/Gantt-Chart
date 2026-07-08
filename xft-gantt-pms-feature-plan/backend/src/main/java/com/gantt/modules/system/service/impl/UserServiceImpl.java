@@ -10,6 +10,7 @@ import com.gantt.modules.system.entity.User;
 import com.gantt.modules.system.mapper.UserMapper;
 import com.gantt.modules.system.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -20,6 +21,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService, StpInterface {
 
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public User register(UserRegisterDTO dto) {
@@ -32,7 +34,7 @@ public class UserServiceImpl implements UserService, StpInterface {
 
         User user = new User();
         user.setUsername(dto.getUsername());
-        user.setPassword(dto.getPassword());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setNickname(dto.getNickname());
         user.setEmail(dto.getEmail());
         user.setPhone(dto.getPhone());
@@ -46,7 +48,7 @@ public class UserServiceImpl implements UserService, StpInterface {
         User user = userMapper.selectOne(
                 new LambdaQueryWrapper<User>().eq(User::getUsername, dto.getUsername())
         );
-        if (user == null || !user.getPassword().equals(dto.getPassword())) {
+        if (user == null || !passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             throw new BusinessException("用户名或密码错误");
         }
         if (user.getStatus() != 1) {
