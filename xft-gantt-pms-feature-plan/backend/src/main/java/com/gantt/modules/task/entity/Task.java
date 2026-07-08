@@ -5,19 +5,18 @@ import com.gantt.common.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("biz_task")
+@TableName("plan_task")
 public class Task extends BaseEntity {
 
-    private Long planId;
+    private Long projectId;
 
     private Long parentId;
 
-    private String title;
+    private String name;
 
     private String description;
 
@@ -31,7 +30,7 @@ public class Task extends BaseEntity {
 
     private Integer status;
 
-    private BigDecimal progress;
+    private Integer progress;
 
     private Integer sortOrder;
 }

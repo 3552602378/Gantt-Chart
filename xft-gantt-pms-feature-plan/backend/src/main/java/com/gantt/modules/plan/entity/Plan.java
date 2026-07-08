@@ -9,18 +9,18 @@ import java.time.LocalDate;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("biz_plan")
+@TableName("plan_project")
 public class Plan extends BaseEntity {
 
-    private String title;
+    private String name;
 
-    private String type;
+    private String description;
 
     private LocalDate startDate;
 
     private LocalDate endDate;
 
-    private Integer progress;
+    private Integer status;
 
-    private Long userId;
+    private Integer progress;
 }
