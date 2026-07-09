@@ -13,18 +13,7 @@
         text-color="#ffffffa6"
         active-text-color="#409eff"
       >
-        <el-menu-item index="/plan">
-          <el-icon><Calendar /></el-icon>
-          <template #title>计划管理</template>
-        </el-menu-item>
-        <el-menu-item index="/task">
-          <el-icon><List /></el-icon>
-          <template #title>任务管理</template>
-        </el-menu-item>
-        <el-menu-item index="/system">
-          <el-icon><Setting /></el-icon>
-          <template #title>系统管理</template>
-        </el-menu-item>
+        <SidebarMenu :menus="userStore.menuRoutes" />
       </el-menu>
     </el-aside>
     <el-container>
@@ -61,6 +50,7 @@
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/appStore'
 import { useUserStore } from '@/stores/userStore'
+import SidebarMenu from '@/layouts/SidebarMenu.vue'
 
 const route = useRoute()
 const router = useRouter()
