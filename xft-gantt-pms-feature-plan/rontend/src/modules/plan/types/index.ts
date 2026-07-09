@@ -18,11 +18,19 @@ export enum PlanStatus {
   ARCHIVED = 3,
 }
 
+export interface PageResult<T> {
+  records: T[]
+  total: number
+  size: number
+  current: number
+  pages: number
+}
+
 export interface PlanQuery {
   name?: string
   status?: PlanStatus
-  pageNum?: number
-  pageSize?: number
+  page?: number
+  size?: number
 }
 
 export interface PlanCreateDTO {
@@ -30,4 +38,16 @@ export interface PlanCreateDTO {
   description?: string
   startDate: string
   endDate: string
+  status?: PlanStatus
+  progress?: number
+}
+
+export interface PlanUpdateDTO {
+  id: number
+  name?: string
+  description?: string
+  startDate?: string
+  endDate?: string
+  status?: PlanStatus
+  progress?: number
 }

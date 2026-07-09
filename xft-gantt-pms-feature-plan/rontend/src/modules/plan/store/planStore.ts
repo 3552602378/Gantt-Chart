@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Plan, PlanQuery, PlanCreateDTO } from '@/modules/plan/types'
+import type { Plan, PlanQuery, PlanCreateDTO, PlanUpdateDTO } from '@/modules/plan/types'
 import {
   getPlanListApi,
   getPlanByIdApi,
@@ -15,12 +15,16 @@ export const usePlanStore = defineStore('plan', () => {
   const currentPlan = ref<Plan | null>(null)
   const loading = ref(false)
   const total = ref(0)
+  const page = ref(1)
+  const size = ref(10)
 
   async function fetchPlanList(query: PlanQuery = {}) {
     loading.value = true
     try {
-      const res = await getPlanListApi(query)
-      planList.value = res.data
+      const params = { page: page.value, size: size.value, ...query }
+      const res = await getPlanListApi(params)
+      planList.value = res.data.records
+      total.value = res.data.total
     } finally {
       loading.value = false
     }
@@ -40,14 +44,14 @@ export const usePlanStore = defineStore('plan', () => {
   async function createPlan(data: PlanCreateDTO) {
     const res = await createPlanApi(data)
     ElMessage.success('创建成功')
-    planList.value.unshift(res.data)
+    await fetchPlanList()
     return res.data
   }
 
-  async function updatePlan(id: number, data: Partial<PlanCreateDTO>) {
-    const res = await updatePlanApi(id, data)
+  async function updatePlan(data: PlanUpdateDTO) {
+    const res = await updatePlanApi(data)
     ElMessage.success('更新成功')
-    const idx = planList.value.findIndex((p) => p.id === id)
+    const idx = planList.value.findIndex((p) => p.id === data.id)
     if (idx !== -1) planList.value[idx] = res.data
     return res.data
   }
@@ -55,7 +59,7 @@ export const usePlanStore = defineStore('plan', () => {
   async function deletePlan(id: number) {
     await deletePlanApi(id)
     ElMessage.success('删除成功')
-    planList.value = planList.value.filter((p) => p.id !== id)
+    await fetchPlanList()
   }
 
   return {
@@ -63,6 +67,8 @@ export const usePlanStore = defineStore('plan', () => {
     currentPlan,
     loading,
     total,
+    page,
+    size,
     fetchPlanList,
     fetchPlanById,
     createPlan,

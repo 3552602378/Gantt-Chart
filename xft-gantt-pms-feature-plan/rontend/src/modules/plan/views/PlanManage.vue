@@ -10,10 +10,10 @@
 
       <el-form inline :model="queryForm" class="query-form">
         <el-form-item label="计划名称">
-          <el-input v-model="queryForm.name" placeholder="请输入" clearable />
+          <el-input v-model="queryForm.name" placeholder="请输入" clearable @keyup.enter="handleSearch" />
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="queryForm.status" placeholder="全部" clearable>
+          <el-select v-model="queryForm.status" placeholder="全部" clearable style="width: 140px">
             <el-option label="草稿" :value="0" />
             <el-option label="进行中" :value="1" />
             <el-option label="已完成" :value="2" />
@@ -22,6 +22,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">查询</el-button>
+          <el-button @click="handleReset">重置</el-button>
         </el-form-item>
       </el-form>
 
@@ -30,7 +31,7 @@
         <el-table-column prop="name" label="计划名称" min-width="150" />
         <el-table-column prop="startDate" label="开始日期" width="120" />
         <el-table-column prop="endDate" label="结束日期" width="120" />
-        <el-table-column prop="progress" label="进度" width="100">
+        <el-table-column prop="progress" label="进度" width="140">
           <template #default="{ row }">
             <el-progress :percentage="row.progress" :stroke-width="6" />
           </template>
@@ -51,17 +52,40 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <div class="pagination">
+        <el-pagination
+          v-model:current-page="planStore.page"
+          v-model:page-size="planStore.size"
+          :total="planStore.total"
+          :page-sizes="[10, 20, 50]"
+          layout="total, sizes, prev, pager, next, jumper"
+          background
+          @current-change="fetchList"
+          @size-change="onSizeChange"
+        />
+      </div>
     </el-card>
+
+    <PlanFormDialog
+      v-model="dialogVisible"
+      :plan="currentPlan"
+      @success="fetchList"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { usePlanStore } from '@/modules/plan/store/planStore'
 import { PlanStatus } from '@/modules/plan/types'
+import type { Plan } from '@/modules/plan/types'
+import PlanFormDialog from '@/modules/plan/components/PlanFormDialog.vue'
 
 const planStore = usePlanStore()
 const queryForm = reactive({ name: '', status: undefined as PlanStatus | undefined })
+const dialogVisible = ref(false)
+const currentPlan = ref<Plan | null>(null)
 
 function statusLabel(status: PlanStatus) {
   const map: Record<PlanStatus, string> = {
@@ -83,16 +107,35 @@ function statusTagType(status: PlanStatus): 'info' | 'primary' | 'success' | 'wa
   return map[status] ?? 'info'
 }
 
-function handleSearch() {
+function fetchList() {
   planStore.fetchPlanList({ ...queryForm })
 }
 
-function handleCreate() {
-  // TODO: open dialog
+function handleSearch() {
+  planStore.page = 1
+  fetchList()
 }
 
-function handleEdit(_row: any) {
-  // TODO: open dialog
+function handleReset() {
+  queryForm.name = ''
+  queryForm.status = undefined
+  planStore.page = 1
+  fetchList()
+}
+
+function onSizeChange() {
+  planStore.page = 1
+  fetchList()
+}
+
+function handleCreate() {
+  currentPlan.value = null
+  dialogVisible.value = true
+}
+
+function handleEdit(row: Plan) {
+  currentPlan.value = row
+  dialogVisible.value = true
 }
 
 function handleDelete(id: number) {
@@ -100,7 +143,7 @@ function handleDelete(id: number) {
 }
 
 onMounted(() => {
-  planStore.fetchPlanList()
+  fetchList()
 })
 </script>
 
@@ -113,5 +156,11 @@ onMounted(() => {
 
 .query-form {
   margin-bottom: 16px;
+}
+
+.pagination {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
 }
 </style>
