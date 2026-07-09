@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gantt.modules.system.mapper.MenuMapper">
+
+    <!-- 当前用户可见菜单（type!=2：目录+菜单，排除按钮），按角色联表 -->
+    <select id="selectMenusByUserId" resultType="com.gantt.modules.system.entity.Menu">
+        SELECT DISTINCT m.*
+        FROM sys_user_role ur
+        INNER JOIN sys_role r       ON r.id = ur.role_id      AND r.deleted = 0 AND r.status = 1
+        INNER JOIN sys_role_menu rm ON rm.role_id = r.id
+        INNER JOIN sys_menu m       ON m.id = rm.menu_id      AND m.deleted = 0
+        WHERE ur.user_id = #{userId}
+          AND m.type != 2
+          AND m.visible = 1
+        ORDER BY m.parent_id ASC, m.sort ASC
+    </select>
+
+</mapper>
