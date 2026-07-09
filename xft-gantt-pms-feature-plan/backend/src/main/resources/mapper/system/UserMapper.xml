@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gantt.modules.system.mapper.UserMapper">
+
+    <!-- user → sys_user_role → sys_role → sys_role_menu → sys_menu，取 DISTINCT permission -->
+    <select id="selectPermissionsByUserId" resultType="java.lang.String">
+        SELECT DISTINCT m.permission
+        FROM sys_user_role ur
+        INNER JOIN sys_role r      ON r.id = ur.role_id      AND r.deleted = 0 AND r.status = 1
+        INNER JOIN sys_role_menu rm ON rm.role_id = r.id
+        INNER JOIN sys_menu m      ON m.id = rm.menu_id      AND m.deleted = 0
+        WHERE ur.user_id = #{userId}
+          AND m.permission IS NOT NULL
+          AND m.permission != ''
+    </select>
+
+    <!-- user → sys_user_role → sys_role，取 role_key -->
+    <select id="selectRoleKeysByUserId" resultType="java.lang.String">
+        SELECT r.role_key
+        FROM sys_user_role ur
+        INNER JOIN sys_role r ON r.id = ur.role_id AND r.deleted = 0 AND r.status = 1
+        WHERE ur.user_id = #{userId}
+    </select>
+
+</mapper>

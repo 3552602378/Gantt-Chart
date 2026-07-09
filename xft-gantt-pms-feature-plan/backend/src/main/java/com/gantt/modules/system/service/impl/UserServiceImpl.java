@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -71,11 +70,13 @@ public class UserServiceImpl implements UserService, StpInterface {
 
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
-        return Collections.singletonList("*");
+        Long userId = Long.parseLong(String.valueOf(loginId));
+        return userMapper.selectPermissionsByUserId(userId);
     }
 
     @Override
     public List<String> getRoleList(Object loginId, String loginType) {
-        return Collections.singletonList("admin");
+        Long userId = Long.parseLong(String.valueOf(loginId));
+        return userMapper.selectRoleKeysByUserId(userId);
     }
 }
