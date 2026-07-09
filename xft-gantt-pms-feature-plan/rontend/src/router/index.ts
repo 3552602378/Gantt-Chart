@@ -14,8 +14,10 @@ function toRouteRecord(menu: MenuRoute): RouteRecordRaw | null {
   if (!menu.component) return null
   const component = loadComponent(menu.component)
   if (!component) return null
+  // path 去掉开头的 /，作为 DefaultLayout 的相对子路由
+  const relativePath = menu.path.replace(/^\//, '')
   return {
-    path: menu.path,
+    path: relativePath,
     name: menu.path.replace(/\//g, '-').slice(1),
     component,
     meta: { title: menu.name, icon: menu.icon, permission: menu.path },
@@ -81,8 +83,14 @@ router.beforeEach(async (to, _from, next) => {
     return
   }
   try {
+    const wasAdded = dynamicRoutesAdded
     await ensureDynamicRoutes()
-    next({ ...to, replace: true })
+    // 仅在本次新加了动态路由后才需要 replace 重新匹配，否则直接放行避免无限重定向
+    if (wasAdded) {
+      next()
+    } else {
+      next({ ...to, replace: true })
+    }
   } catch (e) {
     const userStore = useUserStore()
     userStore.logout()
