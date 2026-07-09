@@ -1,5 +1,7 @@
 package com.gantt.common.exception;
 
+import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.exception.NotPermissionException;
 import com.gantt.common.result.Result;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,20 @@ public class GlobalExceptionHandler {
     public Result<Void> handleBusinessException(BusinessException e) {
         log.warn("业务异常: {}", e.getMessage());
         return Result.fail(e.getCode(), e.getMessage());
+    }
+
+    @ExceptionHandler(NotLoginException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Result<Void> handleNotLogin(NotLoginException e) {
+        log.warn("未登录: {}", e.getMessage());
+        return Result.fail(401, "未登录或登录已过期");
+    }
+
+    @ExceptionHandler(NotPermissionException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Result<Void> handleNoPermission(NotPermissionException e) {
+        log.warn("无权限: {}", e.getMessage());
+        return Result.fail(403, "无访问权限");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
